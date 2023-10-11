@@ -15,4 +15,4 @@ This is repo for blue & red pills prototypes and etc
 
 **cpuid_man** - //Добавьте описание пж пж
 
-**hv_vendor_id** - //Добавьте описание пж пж
+**cpuid_hv_man** - //Добавьте описание пж пж
