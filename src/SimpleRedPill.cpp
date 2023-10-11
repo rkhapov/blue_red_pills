@@ -24,33 +24,73 @@ SimpleRedPill::args_checker() {
 
 std::string
 SimpleRedPill::red_pill_caller() {
-    unsigned int regs1[12];
-    unsigned int regs2[3];
-    char str[sizeof(regs1) + 1 + sizeof(regs2) + 1];
+    return red_pill_1() + "\n" + red_pill_2() + "\n" + red_pill_3() + "\n";
+}
 
-    __cpuid(0x80000000, regs1[0], regs1[1], regs1[2], regs1[3]);
+std::string
+SimpleRedPill::red_pill_1() {
+    unsigned int regs[12];
+    char str[sizeof(regs) + 1];
 
-    if (regs1[0] < 0x80000004)
+    __cpuid(0x80000000, regs[0], regs[1], regs[2], regs[3]);
+
+    if (regs[0] < 0x80000004)
         exit(-1);
 
-    __cpuid(0x80000002, regs1[0], regs1[1], regs1[2], regs1[3]);
-    __cpuid(0x80000003, regs1[4], regs1[5], regs1[6], regs1[7]);
-    __cpuid(0x80000004, regs1[8], regs1[9], regs1[10], regs1[11]);
+    __cpuid(0x80000002, regs[0], regs[1], regs[2], regs[3]);
+    __cpuid(0x80000003, regs[4], regs[5], regs[6], regs[7]);
+    __cpuid(0x80000004, regs[8], regs[9], regs[10], regs[11]);
 
-    memcpy(str, regs1, sizeof(regs1));
-    str[sizeof(regs1)] = '\n';
+    memcpy(str, regs, sizeof(regs));
 
-    __cpuid(0x00000000, regs1[0], regs2[0], regs2[2], regs2[1]);
-
-    memcpy(str + sizeof(regs1) + 1, regs2, sizeof(regs2));
     for(size_t i = 0; i < sizeof(str); i++) {
         if(str[i] == 0) {
             str[i] = 1;
         }
     }
-    str[sizeof(regs1) + 1 + sizeof(regs2)] = '\0';
+    str[sizeof(regs)] = '\0';
 
     return std::string(str);
-
-    return 0;
 }
+
+
+std::string
+SimpleRedPill::red_pill_2() {
+    unsigned int regs[4];
+    char str[sizeof(regs) + 1];
+
+    __cpuid(0x00000000, regs[3], regs[0], regs[2], regs[1]);
+
+    memcpy(str, regs, sizeof(regs));
+
+    for(size_t i = 0; i < sizeof(str); i++) {
+        if(str[i] == 0) {
+            str[i] = 1;
+        }
+    }
+    str[sizeof(regs)] = '\0';
+
+    return std::string(str);
+}
+
+
+std::string
+SimpleRedPill::red_pill_3() {
+    unsigned int empty[0];
+    unsigned int regs[3];
+    char str[sizeof(regs) + 1];
+
+    __cpuid(0x40000000, empty[0], regs[0], regs[2], regs[1]);
+
+    memcpy(str, regs, sizeof(regs));
+
+    for(size_t i = 0; i < sizeof(str); i++) {
+        if(str[i] == 0) {
+            str[i] = 1;
+        }
+    }
+    str[sizeof(regs)] = '\0';
+
+    return std::string(str);
+}
+
