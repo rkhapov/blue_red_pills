@@ -19,13 +19,13 @@ public:
 
     std::string red_pill_caller() override;
 
+protected:
     std::string red_pill_1();
 
     std::string red_pill_2();
 
     std::string red_pill_3();
 
-protected:
     int argc_;
     const char **argv_;
 };
