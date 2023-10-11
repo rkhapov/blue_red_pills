@@ -80,7 +80,7 @@ SimpleRedPill::red_pill_3() {
     unsigned int regs[3];
     char str[sizeof(regs) + 1];
 
-    __cpuid(0x40000000, empty[0], regs[0], regs[2], regs[1]);
+    __cpuid(0x40000000, empty[0], regs[0], regs[1], regs[2]);
 
     memcpy(str, regs, sizeof(regs));
 
