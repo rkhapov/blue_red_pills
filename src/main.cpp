@@ -1,6 +1,10 @@
 #include "Constants.h"
 #include "RedPill.h"
-#include "SimpleRedPill.h"
+
+#include "CpuProcName.h"
+#include "CpuidMan.h"
+#include "CpuidHvMan.h"
+
 
 #include <memory>
 #include <vector>
@@ -20,13 +24,25 @@ int main(int argc, char** argv) {
     std::vector<std::shared_ptr<RedPill>> all_red_pills;
 
     const char** const_argv = const_cast<const char **>(argv);
-    SimpleRedPill first_pill = SimpleRedPill(argc, const_argv);
+
+    CpuProcName cpuProcName(argc, const_argv);
+    CpuidMan cpuidMan(argc, const_argv);
+    CpuidHvMan cpuidHvMan(argc, const_argv);
+
     all_red_pills.push_back(
-        std::make_shared<SimpleRedPill>(first_pill)
+        std::make_shared<CpuProcName>(cpuProcName)
+    );
+
+    all_red_pills.push_back(
+        std::make_shared<CpuidMan>(cpuidMan)
+    );
+
+    all_red_pills.push_back(
+        std::make_shared<CpuidHvMan>(cpuidHvMan)
     );
 
     for (const auto& red_pill : all_red_pills) {
-        if (red_pill->args_checker()) {
+        if (red_pill->args_checker() != RedPill::StatusForRun::kCannot) {
             std::cout << red_pill->red_pill_caller() << "\n";
         }
     }
