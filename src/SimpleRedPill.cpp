@@ -43,7 +43,7 @@ SimpleRedPill::red_pill_caller() {
     __cpuid(0x00000000, regs1[0], regs2[0], regs2[2], regs2[1]);
 
     memcpy(str + sizeof(regs1) + 1, regs2, sizeof(regs2));
-    for(int i = 0; i < sizeof(str); i++) {
+    for(size_t i = 0; i < sizeof(str); i++) {
         if(str[i] == 0) {
             str[i] = 1;
         }
