@@ -8,7 +8,6 @@
 
 
 /*
-
 Для работы после сборки (команда "make")
 Затем с желаемыми аргументами ("./main $ARGS")
 
@@ -20,7 +19,6 @@ int main(int argc, char** argv) {
 
     std::vector<std::shared_ptr<RedPill>> all_red_pills;
 
-    
     const char** const_argv = const_cast<const char **>(argv);
     SimpleRedPill first_pill = SimpleRedPill(argc, const_argv);
     all_red_pills.push_back(
