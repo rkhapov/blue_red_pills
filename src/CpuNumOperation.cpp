@@ -59,20 +59,15 @@ CpuNumOperation::red_pill_caller() const {
         ticks_counts.push_back(end_tick - start_tick);
     }
 
-
     std::sort(ticks_counts.begin(), ticks_counts.end());
 
-
-    uint64_t q_0025 = ticks_counts[acc_ / quantile], q_975 = ticks_counts[acc_ - acc_ / quantile];
-
+    uint64_t q_0025 = ticks_counts[acc_ / quantile], q_975 = ticks_counts[acc_ - acc_ / quantile - 1];
 
     double mean =  static_cast<double>(std::accumulate(
                                        ticks_counts.begin() +  acc_ / quantile, 
                                        ticks_counts.end() -  acc_ / quantile, 
                                        0ULL
     )) / acc_;
-
-
 
     double std = static_cast<double>(std::accumulate(
                                          ticks_counts.begin() + acc_ / quantile,
@@ -85,35 +80,39 @@ CpuNumOperation::red_pill_caller() const {
 
     std::string confidence_interval = "(" + std::to_string(q_0025) + " : " + std::to_string(q_975) + ")"; 
 
-    std::string command = "cpuid", number_call = std::to_string(acc_);   
+    std::string command = "cpuid", number_call = std::to_string(acc_);  
 
+    size_t fib_num = 100;
     return "Command: "          + command + "\n" + 
            "Number of call: "   + number_call + + "\n" + 
            "95% interval: "     + confidence_interval + "\n" +
            "Mean: "             + std::to_string(mean) + "\n" + 
            "Std: "              + std::to_string(std::sqrt(std)) + "\n" + 
-           "Fib take "          + std::to_string(static_cast<double>(get_num_tick_for_fib(acc_)) / acc_);
+           "Fib take "          + std::to_string(get_mean_ticks_takes_fib(fib_num)) + " for " + std::to_string(fib_num);
 }
 
-
-uint64_t
-CpuNumOperation::get_num_tick_for_fib(size_t n) const {
+double
+CpuNumOperation::get_mean_ticks_takes_fib(size_t n) const {
     uint64_t start_time, end_time;
 
-    get_current_tick(&start_time);
+    std::vector<uint64_t> one_circ_take;
 
-    int64_t a0 = 0;
-    int64_t a1 = 1;
-    int64_t cur;
-    
-    for(size_t i = 2; i < n; i++) {
-        cur = a0 + a1;
-        a0 = a1;
-        a1 = cur;
+    for (size_t i = 0; i < acc_; ++i) {
+        get_current_tick(&start_time);
+
+        int64_t a0 = 0;
+        int64_t a1 = 1;
+        int64_t cur;
+        
+        for(size_t i = 2; i < n; i++) {
+            cur = a0 + a1;
+            a0 = a1;
+            a1 = cur;
+        }
+
+        get_current_tick(&end_time);
+        one_circ_take.push_back(end_time - start_time);
     }
 
-    get_current_tick(&end_time);
-
-    return end_time - start_time;
-
+    return static_cast<double>( std::accumulate(one_circ_take.begin(), one_circ_take.end(), 0ULL)) / acc_;
 }
