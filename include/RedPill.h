@@ -18,7 +18,7 @@ public:
 
     virtual std::string red_pill_caller() const = 0;
 
-    bool check_args_have_flag(const std::string& flag_name) const;
+    size_t check_args_have_flag(const std::string& flag_name) const;
 
     virtual ~RedPill() = default;
 

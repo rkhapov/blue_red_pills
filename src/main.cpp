@@ -4,6 +4,7 @@
 #include "CpuProcName.h"
 #include "CpuidMan.h"
 #include "CpuidHvMan.h"
+#include "CpuNumOperation.h"
 
 
 #include <memory>
@@ -28,6 +29,8 @@ int main(int argc, char** argv) {
     CpuProcName cpuProcName(argc, const_argv);
     CpuidMan cpuidMan(argc, const_argv);
     CpuidHvMan cpuidHvMan(argc, const_argv);
+    CpuNumOperation cpuNumOperation(argc, const_argv);
+    
 
     all_red_pills.push_back(
         std::make_shared<CpuProcName>(cpuProcName)
@@ -40,6 +43,11 @@ int main(int argc, char** argv) {
     all_red_pills.push_back(
         std::make_shared<CpuidHvMan>(cpuidHvMan)
     );
+
+    all_red_pills.push_back(
+        std::make_shared<CpuNumOperation>(cpuNumOperation)
+    );
+
 
     for (const auto& red_pill : all_red_pills) {
         if (red_pill->args_checker() != RedPill::StatusForRun::kCannot) {
