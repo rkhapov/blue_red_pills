@@ -56,21 +56,18 @@ CpuNumOperation::red_pill_caller() const {
 
     uint64_t q_0025 = ticks_counts[acc_ / quantile], q_975 = ticks_counts[acc_ - acc_ / quantile];
 
-    for (int i = 0; i < 10; ++i) {
-        std::cout << ticks_counts[ticks_counts.size() -  i - 1] << "\n";
-    }
 
     double mean =  static_cast<double>(std::accumulate(
-                                       ticks_counts.begin(), 
-                                       ticks_counts.end(), 
+                                       ticks_counts.begin() +  acc_ / quantile, 
+                                       ticks_counts.end() -  acc_ / quantile, 
                                        0ULL
     )) / acc_;
 
 
 
     double std = static_cast<double>(std::accumulate(
-                                         ticks_counts.begin(),
-                                         ticks_counts.end(),
+                                         ticks_counts.begin() + acc_ / quantile,
+                                         ticks_counts.end() - acc_ / quantile,
                                          0ULL,
                                          [&mean](uint64_t first, uint64_t second) {
                                              return first + (second - mean) * (second - mean);
@@ -85,8 +82,7 @@ CpuNumOperation::red_pill_caller() const {
            "Number of call: "   + number_call + + "\n" + 
            "95% interval: "     + confidence_interval + "\n" +
            "Mean: "             + std::to_string(mean) + "\n" + 
-           "Std: "              + std::to_string(std::sqrt(std)) + "\n"
-           "Last value: "       + std::to_string(ticks_counts.back());
+           "Std: "              + std::to_string(std::sqrt(std)) + "\n";
 }
 
 uint64_t 
