@@ -88,7 +88,7 @@ CpuNumOperation::red_pill_caller() const {
            "95% interval: "     + confidence_interval + "\n" +
            "Mean: "             + std::to_string(mean) + "\n" + 
            "Std: "              + std::to_string(std::sqrt(std)) + "\n" + 
-           "Fib take "          + std::to_string(get_mean_ticks_takes_fib(fib_num)) + " for " + std::to_string(fib_num);
+           "Fib take "          + std::to_string(get_mean_ticks_takes_fib(fib_num)) + " for " + std::to_string(fib_num) + " number";
 }
 
 double
