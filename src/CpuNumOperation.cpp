@@ -11,6 +11,13 @@
 #include <numeric>
 #include <cmath>
 
+
+#define get_current_tick(ticks)  { \
+    unsigned int lo, hi;                                \
+    asm volatile ( "rdtsc\n" : "=a" (lo), "=d" (hi));   \
+    *ticks = (static_cast<uint64_t>(hi) << 32) | lo;     \
+    }
+
 CpuNumOperation::CpuNumOperation(int argc, const char ** argv) : RedPill(argc, argv) {
 }
 
@@ -44,9 +51,11 @@ CpuNumOperation::red_pill_caller() const {
 
     unsigned int empty[4];
     for (size_t i = 0; i < acc_; ++i) {
-        start_tick = get_current_tick();
+        get_current_tick(&start_tick);
         __cpuid(0x80000001, empty[0], empty[1], empty[2], empty[3]);
-        end_tick = get_current_tick();
+
+        get_current_tick(&end_tick);
+
         ticks_counts.push_back(end_tick - start_tick);
     }
 
@@ -82,12 +91,29 @@ CpuNumOperation::red_pill_caller() const {
            "Number of call: "   + number_call + + "\n" + 
            "95% interval: "     + confidence_interval + "\n" +
            "Mean: "             + std::to_string(mean) + "\n" + 
-           "Std: "              + std::to_string(std::sqrt(std)) + "\n";
+           "Std: "              + std::to_string(std::sqrt(std)) + "\n" + 
+           "Fib take "          + std::to_string(static_cast<double>(get_num_tick_for_fib(acc_)) / acc_);
 }
 
-uint64_t 
-CpuNumOperation::get_current_tick() const {
-    unsigned int lo, hi;
-    asm volatile ( "rdtsc\n" : "=a" (lo), "=d" (hi) );
-    return (static_cast<uint64_t>(hi) << 32) | lo;
+
+uint64_t
+CpuNumOperation::get_num_tick_for_fib(size_t n) const {
+    uint64_t start_time, end_time;
+
+    get_current_tick(&start_time);
+
+    int64_t a0 = 0;
+    int64_t a1 = 1;
+    int64_t cur;
+    
+    for(size_t i = 2; i < n; i++) {
+        cur = a0 + a1;
+        a0 = a1;
+        a1 = cur;
+    }
+
+    get_current_tick(&end_time);
+
+    return end_time - start_time;
+
 }
