@@ -6,6 +6,10 @@
 #include <cstring>
 #include <cpuid.h>
 #include <stdexcept>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+#include <cmath>
 
 CpuNumOperation::CpuNumOperation(int argc, const char ** argv) : RedPill(argc, argv) {
 }
@@ -33,20 +37,56 @@ CpuNumOperation::args_checker() const {
 std::string
 CpuNumOperation::red_pill_caller() const {
 
-    uint64_t start_tick = get_current_tick();
+    const size_t quantile = 40;
+
+    std::vector<uint64_t> ticks_counts;    
+    uint64_t start_tick, end_tick;
 
     unsigned int empty[4];
     for (size_t i = 0; i < acc_; ++i) {
+        start_tick = get_current_tick();
         __cpuid(0x80000001, empty[0], empty[1], empty[2], empty[3]);
+        end_tick = get_current_tick();
+        ticks_counts.push_back(end_tick - start_tick);
     }
 
-    uint64_t end_tick = get_current_tick();
 
-    double mean_num_ticks = static_cast<double>(end_tick - start_tick) / acc_;
+    std::sort(ticks_counts.begin(), ticks_counts.end());
 
-    return "Call " + std::to_string(acc_) + " times command 'cpuid' takes " + 
-           std::to_string(end_tick - start_tick) + " ticks" + "( mean ~ " + 
-           std::to_string(mean_num_ticks) + "ticks )";
+
+    uint64_t q_0025 = ticks_counts[acc_ / quantile], q_975 = ticks_counts[acc_ - acc_ / quantile];
+
+    for (int i = 0; i < 10; ++i) {
+        std::cout << ticks_counts[ticks_counts.size() -  i - 1] << "\n";
+    }
+
+    double mean =  static_cast<double>(std::accumulate(
+                                       ticks_counts.begin(), 
+                                       ticks_counts.end(), 
+                                       0ULL
+    )) / acc_;
+
+
+
+    double std = static_cast<double>(std::accumulate(
+                                         ticks_counts.begin(),
+                                         ticks_counts.end(),
+                                         0ULL,
+                                         [&mean](uint64_t first, uint64_t second) {
+                                             return first + (second - mean) * (second - mean);
+                                         }
+    )) / acc_;
+
+    std::string confidence_interval = "(" + std::to_string(q_0025) + " : " + std::to_string(q_975) + ")"; 
+
+    std::string command = "cpuid", number_call = std::to_string(acc_);   
+
+    return "Command: "          + command + "\n" + 
+           "Number of call: "   + number_call + + "\n" + 
+           "95% interval: "     + confidence_interval + "\n" +
+           "Mean: "             + std::to_string(mean) + "\n" + 
+           "Std: "              + std::to_string(std::sqrt(std)) + "\n"
+           "Last value: "       + std::to_string(ticks_counts.back());
 }
 
 uint64_t 
