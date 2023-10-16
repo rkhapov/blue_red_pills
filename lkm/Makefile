@@ -7,5 +7,6 @@ clean:
 test:
 	sudo dmesg -C
 	sudo insmod lkm_example.ko
+	sudo dmesg
 	sudo rmmod lkm_example.ko
-	dmesg
+	

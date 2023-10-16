@@ -37,7 +37,8 @@ sum_time=0;
 
     // If AVX is supported, enable it in XCR0
     if (avxSupported) {
-    for(int i=0; i<100; i++){
+    int i = 0;
+    for(i=0; i<100; i++){
        get_current_tick(&start_time);
         asm volatile (
             "xgetbv"
