@@ -1,1 +1,0 @@
-cmd_/home/admin/blue_red_pills/lkm/Module.symvers := sed 's/\.ko$$/\.o/' /home/admin/blue_red_pills/lkm/modules.order | scripts/mod/modpost -m -a  -o /home/admin/blue_red_pills/lkm/Module.symvers -e -i Module.symvers   -T -
